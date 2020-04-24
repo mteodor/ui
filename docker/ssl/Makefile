@@ -3,7 +3,7 @@ KEY = default
 O = Mainflux
 OU = mainflux
 EA = info@mainflux.com
-CN = localhost
+CN = mainflux.ml
 CRT_FILE_NAME = thing
 
 all: clean_certs ca server_crt
