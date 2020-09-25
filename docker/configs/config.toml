@@ -1,3 +1,21 @@
+[server]
+  LogLevel = "debug"
+  ca_certs = ""
+  http_port = "8190"
+  mf_api_key = ""
+  mf_bs_url = "http://localhost:8202"
+  mf_certs_url = "http://localhost/certs"
+  mf_pass = ""
+  mf_user = ""
+  mf_whit_list = "http://localhost:8202/things/state"
+  mqtt_url = ""
+  port = ""
+  server_cert = ""
+  server_key = ""
+  things_location = "http://test.com:8182"
+  tls = true
+  users_location = "http://test.com:81818"
+
 [bootstrap]
   [bootstrap.content]
     [bootstrap.content.agent.edgex]
