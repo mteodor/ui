@@ -31,13 +31,13 @@
 
     <nb-card size="small">
       <nb-card-header class="header-details">
-        Image
+        Raw Messages
       </nb-card-header>
       <nb-card-body>
         <div *ngIf="messages.length == 0" style="text-align: center;">
-          No image to display
+          No messages to display
         </div>
-        
+        <pre *ngFor="let message of messages">{{ message | json }}</pre>
       </nb-card-body>
     </nb-card>
   </div>
