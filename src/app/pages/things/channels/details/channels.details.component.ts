@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser'
 
 import { ChannelsService } from 'app/common/services/channels/channels.service';
 import { MessagesService } from 'app/common/services/messages/messages.service';
@@ -26,13 +25,12 @@ export class ChannelsDetailsComponent implements OnInit {
   selectedThings = [];
   editorMetadata = '';
 
-  image = 'data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAABkCAYAAAC/zKGXAAAAKklEQVR42u3KsQ0AAAgDIL3c0+sLriYw06lMHbQoiqIoiqIoiqIoip/jAtiD+TmYhJoAAAAAAElFTkSuQmC';
+  imageWS = 'data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAABkCAYAAAC/zKGXAAAAKklEQVR42u3KsQ0AAAgDIL3c0+sLriYw06lMHbQoiqIoiqIoiqIoip/jAtiD+TmYhJoAAAAAAElFTkSuQmC';
   constructor(
     private route: ActivatedRoute,
     private channelsService: ChannelsService,
     private messagesService: MessagesService,
     private notificationsService: NotificationsService,
-    private domSanitizer: DomSanitizer,
   ) {
   }
 
