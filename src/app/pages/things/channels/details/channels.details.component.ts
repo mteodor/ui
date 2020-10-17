@@ -25,7 +25,7 @@ export class ChannelsDetailsComponent implements OnInit {
 
   selectedThings = [];
   editorMetadata = '';
-  cont = 'data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAABkCAYAAAC/zKGXAAAAKklEQVR42u3KsQ0AAAgDIL3c0+sLriYw06lMHbQoiqIoiqIoiqIoip/jAtiD+TmYhJoAAAAAAElFTkSuQmC';
+
   image = 'data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAABkCAYAAAC/zKGXAAAAKklEQVR42u3KsQ0AAAgDIL3c0+sLriYw06lMHbQoiqIoiqIoiqIoip/jAtiD+TmYhJoAAAAAAElFTkSuQmC';
   constructor(
     private route: ActivatedRoute,
