@@ -25,12 +25,14 @@ export class ChannelsDetailsComponent implements OnInit {
   selectedThings = [];
   editorMetadata = '';
 
+  imageWS = 'data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAABkCAYAAAC/zKGXAAAAKklEQVR42u3KsQ0AAAgDIL3c0+sLriYw06lMHbQoiqIoiqIoiqIoip/jAtiD+TmYhJoAAAAAAElFTkSuQmC';
   constructor(
     private route: ActivatedRoute,
     private channelsService: ChannelsService,
     private messagesService: MessagesService,
     private notificationsService: NotificationsService,
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     const chanID = this.route.snapshot.paramMap.get('id');
