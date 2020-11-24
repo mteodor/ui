@@ -23,6 +23,7 @@ export class GatewaysXtermComponent implements AfterViewInit, OnChanges, OnDestr
   subscriptions: Subscription[] = new Array();
   uuid: string;
   connected: boolean;
+  image = '';
 
   chanSub: Subscription;
   stateSub: Subscription;
@@ -70,7 +71,16 @@ export class GatewaysXtermComponent implements AfterViewInit, OnChanges, OnDestr
           const msg = <SenMLRec>(<any>res[0]);
           term.write(msg.vs);
         });
-      this.notificationsService.success(`Subscribed to channel ${topic}`, '');
+      const imgTopic = `${this.createTopic(this.gateway.metadata.ctrl_channel_id)}/images/#`;
+      this.chanSub = this.mqttService.observe(imgTopic).subscribe(
+        (message: IMqttMessage) => {
+          let res: string;
+          const pl = message.payload.toString();
+          res = JSON.parse(pl);
+          const msg = <SenMLRec>(<any>res[0]);
+          this.image = `data:image/png;base64,` + msg.vs;
+        });
+      this.notificationsService.success(`Subscribed to channel ${imgTopic}`, '');
   }
 
   publish(channel: string, bn: string, n: string, vs: string) {
