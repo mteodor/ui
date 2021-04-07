@@ -36,11 +36,8 @@ export class TokenInterceptor implements HttpInterceptor {
           !request.url.startsWith(environment.bootstrapUrl) &&
           !request.url.startsWith(environment.browseUrl)
         ) {
-          request = request.clone({
-            setHeaders: {
-              'Authorization': token.getValue(),
-            },
-          });
+          const headers = request.headers.append('Authorization', token.getValue());
+          request = request.clone({headers});
         }
         return next.handle(request).pipe(tap(
           resp => {
