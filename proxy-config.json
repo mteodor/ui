@@ -1,11 +1,17 @@
 {
   "/password/*": {
     "target": "http://localhost:8180",
-    "secure": false
+    "secure": false,
+    "changeOrigin": true,
+	  "logLevel": "debug",
+	  "withCredentials": true
   },
   "/users": {
     "target": "http://localhost:8180",
-    "secure": false
+    "secure": false,
+    "changeOrigin": true,
+	  "logLevel": "debug",
+	  "withCredentials": true
   },
   "/members/*": {
     "target": "http://localhost:8189",
@@ -21,11 +27,17 @@
   },
   "/tokens": {
     "target": "http://localhost:8180",
-    "secure": false
+    "secure": false,
+    "changeOrigin": true,
+	  "logLevel": "debug",
+	  "withCredentials": true
   },
   "/things/*": {
     "target": "http://localhost:8182",
-    "secure": false
+    "secure": false,
+    "changeOrigin": true,
+	  "logLevel": "debug",
+	  "withCredentials": true
   },
   "/connect": {
     "target": "http://localhost:8182",
@@ -58,14 +70,23 @@
   },
   "/browse": {
     "target": "http://localhost:8188",
-    "secure": false
+    "secure": false,
+    "changeOrigin": true,
+	  "logLevel": "debug",
+	  "withCredentials": true
   },
   "/twins/*": {
     "target": "http://localhost:9021",
-    "secure": false
+    "secure": false,
+    "changeOrigin": true,
+	  "logLevel": "debug",
+	  "withCredentials": true
   },
   "/states/*": {
     "target": "http://localhost:9021",
-    "secure": false
+    "secure": false,
+    "changeOrigin": true,
+	  "logLevel": "debug",
+	  "withCredentials": true
   }
 }
