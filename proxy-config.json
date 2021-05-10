@@ -43,6 +43,10 @@
     "target": "http://localhost:8182",
     "secure": false
   },
+  "/grafana": {
+    "target": "http://localhost",
+    "secure": false
+  },
   "/channels/*": {
     "target": "http://localhost:8182",
     "secure": false
