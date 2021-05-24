@@ -427,23 +427,23 @@ services:
     networks:
       - mainflux-base-net
 
-  # lora-adapter:
-  #   image: mainflux/lora:latest
-  #   container_name: mainflux-lora
-  #   depends_on:
-  #     - nats
-  #   restart: on-failure
-  #   environment:
-  #     MF_LORA_ADAPTER_LOG_LEVEL: ${MF_LORA_ADAPTER_LOG_LEVEL}
-  #     MF_THINGS_ES_URL: es-redis:${MF_REDIS_TCP_PORT}
-  #     MF_LORA_ADAPTER_ROUTE_MAP_URL: lora-redis:${MF_REDIS_TCP_PORT}
-  #     MF_LORA_ADAPTER_MESSAGES_URL: ${MF_LORA_ADAPTER_MESSAGES_URL}
-  #     MF_LORA_ADAPTER_HTTP_PORT: ${MF_LORA_ADAPTER_HTTP_PORT}
-  #     MF_NATS_URL: ${MF_NATS_URL}
-  #   ports:
-  #     - ${MF_LORA_ADAPTER_HTTP_PORT}:${MF_LORA_ADAPTER_HTTP_PORT}
-  #   networks:
-  #     - mainflux-base-net
+  lora-adapter:
+    image: mainflux/lora:latest
+    container_name: mainflux-lora
+    depends_on:
+      - nats
+    restart: on-failure
+    environment:
+      MF_LORA_ADAPTER_LOG_LEVEL: ${MF_LORA_ADAPTER_LOG_LEVEL}
+      MF_THINGS_ES_URL: es-redis:${MF_REDIS_TCP_PORT}
+      MF_LORA_ADAPTER_ROUTE_MAP_URL: lora-redis:${MF_REDIS_TCP_PORT}
+      MF_LORA_ADAPTER_MESSAGES_URL: ${MF_LORA_ADAPTER_MESSAGES_URL}
+      MF_LORA_ADAPTER_HTTP_PORT: ${MF_LORA_ADAPTER_HTTP_PORT}
+      MF_NATS_URL: ${MF_NATS_URL}
+    ports:
+      - ${MF_LORA_ADAPTER_HTTP_PORT}:${MF_LORA_ADAPTER_HTTP_PORT}
+    networks:
+      - mainflux-base-net
 
   ## BOOTSTRAP
   bootstrap-db:
