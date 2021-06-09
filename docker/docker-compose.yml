@@ -48,6 +48,8 @@ services:
       - ./nginx/entrypoint.sh:/entrypoint.sh
       - ./nginx/snippets:/usr/local/openresty/nginx/conf/snippets
       - ./ssl/authorization.js:/usr/local/openresty/nginx/conf/snippets/authorization.js
+      - ./nginx/access.lua:/usr/local/openresty/nginx/conf/access.lua
+      - ./nginx/introspect.lua:/usr/local/openresty/nginx/conf/introspect.lua
       - ./ssl/certs/mainflux-server.crt:/etc/ssl/certs/mainflux-server.crt
       - ./ssl/certs/ca.crt:/etc/ssl/certs/ca.crt
       - ./ssl/certs/mainflux-server.key:/etc/ssl/private/mainflux-server.key
