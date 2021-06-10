@@ -25,6 +25,7 @@ import { TokenInterceptor } from 'app/auth/auth.token.interceptor.service';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @NgModule({
+
   providers: [
     BootstrapService,
     ChannelsService,

@@ -37,16 +37,18 @@ services:
       MF_UI_PORT: ${MF_UI_PORT}
       MF_UI_MQTT_WS_URL: ${MF_UI_MQTT_WS_URL}
     command: /entrypoint.sh
-
+    
   nginx:
-    image: nginx:1.16.0-alpine
+    image: mainflux-nginx:latest
     container_name: mainflux-nginx
+    tty: true
     restart: on-failure
     volumes:
-      - ./nginx/nginx-${AUTH-key}.conf:/etc/nginx/nginx.conf.template
+      - ./nginx/nginx-${AUTH-key}.conf:/usr/local/openresty/nginx/conf/nginx.conf.template
+      - ./nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
       - ./nginx/entrypoint.sh:/entrypoint.sh
-      - ./nginx/snippets:/etc/nginx/snippets
-      - ./ssl/authorization.js:/etc/nginx/authorization.js
+      - ./nginx/snippets:/usr/local/openresty/nginx/conf/snippets
+      - ./ssl/authorization.js:/usr/local/openresty/nginx/conf/authorization.js
       - ./ssl/certs/mainflux-server.crt:/etc/ssl/certs/mainflux-server.crt
       - ./ssl/certs/ca.crt:/etc/ssl/certs/ca.crt
       - ./ssl/certs/mainflux-server.key:/etc/ssl/private/mainflux-server.key
@@ -129,6 +131,8 @@ services:
       - mainflux-base-net
     volumes:
       - mainflux-users-db-volume:/var/lib/postgresql/data
+    ports:
+      - 6002:5432
 
   users:
     image: mainflux/users:latest
@@ -178,6 +182,8 @@ services:
       - mainflux-base-net
     volumes:
       - mainflux-things-db-volume:/var/lib/postgresql/data
+    ports:
+      - 6001:5432
 
   auth-redis:
     image: redis:5.0-alpine

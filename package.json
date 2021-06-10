@@ -12,7 +12,7 @@
   "scripts": {
     "ng": "ng",
     "conventional-changelog": "conventional-changelog",
-    "start": "ng serve --proxy-config=proxy-config.json",
+    "start": "ng serve --proxy-config=proxy-config.json ",
     "build": "ng build",
     "build:prod": "npm run build -- --prod --aot",
     "test": "ng test",
@@ -63,6 +63,7 @@
     "ng2-charts": "^2.4.2",
     "ng2-ckeditor": "^1.2.2",
     "ng2-completer": "^9.0.1",
+    "ngx-cookie-service": "^11.0.2",
     "ngx-mqtt": "^7.0.14",
     "node-sass": "^4.12.0",
     "normalize.css": "6.0.0",

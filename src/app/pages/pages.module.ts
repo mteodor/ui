@@ -45,6 +45,7 @@ import { TwinsAddComponent } from './twins/add/twins.add.component';
 import { TwinsDetailsComponent } from './twins/details/twins.details.component';
 import { TwinsStatesComponent } from './twins/states/twins.states.component';
 import { TwinsDefinitionsComponent } from './twins/definitions/twins.definitions.component';
+import { GrafanaDetailsComponent } from './things/grafana/grafana.details.component';
 
 @NgModule({
   imports: [
@@ -87,6 +88,7 @@ import { TwinsDefinitionsComponent } from './twins/definitions/twins.definitions
     // Things
     ThingsComponent,
     ThingsAddComponent,
+    GrafanaDetailsComponent,
     ThingsDetailsComponent,
     // Channels
     ChannelsComponent,
