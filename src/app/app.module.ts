@@ -6,11 +6,28 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CoreModule } from './@core/core.module';
 import { ThemeModule } from './@theme/theme.module';
 import { AppComponent } from './app.component';
+import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
+import { 
+  NbAuthJWTToken,
+  NbAuthModule,
+  NB_AUTH_TOKEN_INTERCEPTOR_FILTER
+}  from '@nebular/auth';
+import { ApiJWTInterceptor} from './auth/token.interceptor.service'
+import { AuthGuard } from './auth-guard.service';
+
+import { MqttModule, IMqttServiceOptions, MqttService } from 'ngx-mqtt';
+import { environment } from '../environments/environment';
+export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
+  connectOnCreate: false,
+  url: environment.mqttWsUrl,
+};
+
+
 import {
   NbChatModule,
   NbDatepickerModule,
@@ -28,16 +45,11 @@ import {
 // MFx- Foorm dependency
 import { FormsModule } from '@angular/forms';
 // Mfx - MQTT dependencies for Gateways page
-import { MqttModule, IMqttServiceOptions, MqttService } from 'ngx-mqtt';
-import { environment } from 'environments/environment';
-export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  connectOnCreate: false,
-  url: environment.mqttWsUrl,
-};
 // Mfx - Auth and Profile pages
 import { LogoutComponent } from './pages/logout/logout.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { ProxyAuthStrategy } from './auth/strategy/proxy-strategy';
 
 @NgModule({
   declarations: [
@@ -64,9 +76,11 @@ import { ProfileComponent } from './pages/profile/profile.component';
     NbChatModule.forRoot({
       messageGoogleMapKey: 'AIzaSyA_wNuCzia92MAmdLRzmqitRGvCF7wCZPY',
     }),
-    CoreModule.forRoot(),
+    
+   
     // Mfx dependencies
     MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
+    CoreModule.forRoot(),
     FormsModule,
     NbInputModule,
     NbCardModule,
@@ -75,7 +89,11 @@ import { ProfileComponent } from './pages/profile/profile.component';
   ],
   bootstrap: [AppComponent],
   // Mfx dependencies
-  providers: [MqttService],
+  providers: [
+    AuthGuard,
+    { provide: HTTP_INTERCEPTORS, useClass: ApiJWTInterceptor, multi: true},
+    { provide: NB_AUTH_TOKEN_INTERCEPTOR_FILTER, useValue: function () { return false; }, },
+  ],
 })
 export class AppModule {
 }

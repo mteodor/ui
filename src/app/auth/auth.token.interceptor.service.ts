@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 
 import { NbAuthJWTToken, NbAuthService } from '@nebular/auth';
 
-import { environment } from 'environments/environment';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
