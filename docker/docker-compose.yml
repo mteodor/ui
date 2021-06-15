@@ -46,6 +46,8 @@ services:
       - ./nginx/mfx-${AUTH-key}.conf:/usr/local/openresty/nginx/conf/nginx.conf.template
       - ./nginx/mqtt-${AUTH-key}.conf:/usr/local/openresty/nginx/conf/mqtt.conf.template
       - ./nginx/nginx-${AUTH-key}.conf:/usr/local/openresty/nginx/conf/nginx.conf
+      - ./nginx/access.lua:/usr/local/openresty/nginx/conf/access.lua
+      - ./nginx/verify.lua:/usr/local/openresty/nginx/conf/verify.lua
       - ./nginx/entrypoint.sh:/entrypoint.sh
       - ./nginx/snippets:/usr/local/openresty/nginx/conf/snippets
       - ./ssl/authorization.js:/usr/local/openresty/nginx/conf/snippets/authorization.js
@@ -65,7 +67,7 @@ services:
     command: /entrypoint.sh
     depends_on:
       - things
-      - users
+      # - users
       - mqtt-adapter
       - http-adapter
 
@@ -79,93 +81,93 @@ services:
     networks:
       - mainflux-base-net
 
-  ## AUTH SERVICE
-  auth-db:
-    image: postgres:13.1-alpine
-    container_name: mainflux-auth-db
-    restart: on-failure
-    environment:
-      POSTGRES_USER: ${MF_AUTH_DB_USER}
-      POSTGRES_PASSWORD: ${MF_AUTH_DB_PASS}
-      POSTGRES_DB: ${MF_AUTH_DB}
-    networks:
-      - mainflux-base-net
-    volumes:
-      - mainflux-auth-db-volume:/var/lib/postgresql/data
+  # ## AUTH SERVICE
+  # auth-db:
+  #   image: postgres:13.1-alpine
+  #   container_name: mainflux-auth-db
+  #   restart: on-failure
+  #   environment:
+  #     POSTGRES_USER: ${MF_AUTH_DB_USER}
+  #     POSTGRES_PASSWORD: ${MF_AUTH_DB_PASS}
+  #     POSTGRES_DB: ${MF_AUTH_DB}
+  #   networks:
+  #     - mainflux-base-net
+  #   volumes:
+  #     - mainflux-auth-db-volume:/var/lib/postgresql/data
 
-  auth:
-    image: mainflux/auth:latest
-    container_name: mainflux-auth
-    depends_on:
-      - auth-db
-    expose:
-      - ${MF_AUTH_GRPC_PORT}
-    restart: on-failure
-    environment:
-      MF_AUTH_LOG_LEVEL: ${MF_AUTH_LOG_LEVEL}
-      MF_AUTH_DB_HOST: auth-db
-      MF_AUTH_DB_PORT: ${MF_AUTH_DB_PORT}
-      MF_AUTH_DB_USER: ${MF_AUTH_DB_USER}
-      MF_AUTH_DB_PASS: ${MF_AUTH_DB_PASS}
-      MF_AUTH_DB: ${MF_AUTH_DB}
-      MF_AUTH_HTTP_PORT: ${MF_AUTH_HTTP_PORT}
-      MF_AUTH_GRPC_PORT: ${MF_AUTH_GRPC_PORT}
-      MF_AUTH_SECRET: ${MF_AUTH_SECRET}
-      MF_JAEGER_URL: ${MF_JAEGER_URL}
-    ports:
-      - ${MF_AUTH_HTTP_PORT}:${MF_AUTH_HTTP_PORT}
-      - ${MF_AUTH_GRPC_PORT}:${MF_AUTH_GRPC_PORT}
-    networks:
-      - mainflux-base-net
+  # auth:
+  #   image: mainflux/auth:latest
+  #   container_name: mainflux-auth
+  #   depends_on:
+  #     - auth-db
+  #   expose:
+  #     - ${MF_AUTH_GRPC_PORT}
+  #   restart: on-failure
+  #   environment:
+  #     MF_AUTH_LOG_LEVEL: ${MF_AUTH_LOG_LEVEL}
+  #     MF_AUTH_DB_HOST: auth-db
+  #     MF_AUTH_DB_PORT: ${MF_AUTH_DB_PORT}
+  #     MF_AUTH_DB_USER: ${MF_AUTH_DB_USER}
+  #     MF_AUTH_DB_PASS: ${MF_AUTH_DB_PASS}
+  #     MF_AUTH_DB: ${MF_AUTH_DB}
+  #     MF_AUTH_HTTP_PORT: ${MF_AUTH_HTTP_PORT}
+  #     MF_AUTH_GRPC_PORT: ${MF_AUTH_GRPC_PORT}
+  #     MF_AUTH_SECRET: ${MF_AUTH_SECRET}
+  #     MF_JAEGER_URL: ${MF_JAEGER_URL}
+  #   ports:
+  #     - ${MF_AUTH_HTTP_PORT}:${MF_AUTH_HTTP_PORT}
+  #     - ${MF_AUTH_GRPC_PORT}:${MF_AUTH_GRPC_PORT}
+  #   networks:
+  #     - mainflux-base-net
 
   ## USERS SERVICE
-  users-db:
-    image: postgres:13.1-alpine
-    container_name: mainflux-users-db
-    restart: on-failure
-    environment:
-      POSTGRES_USER: ${MF_USERS_DB_USER}
-      POSTGRES_PASSWORD: ${MF_USERS_DB_PASS}
-      POSTGRES_DB: ${MF_USERS_DB}
-    networks:
-      - mainflux-base-net
-    volumes:
-      - mainflux-users-db-volume:/var/lib/postgresql/data
+  # users-db:
+  #   image: postgres:13.1-alpine
+  #   container_name: mainflux-users-db
+  #   restart: on-failure
+  #   environment:
+  #     POSTGRES_USER: ${MF_USERS_DB_USER}
+  #     POSTGRES_PASSWORD: ${MF_USERS_DB_PASS}
+  #     POSTGRES_DB: ${MF_USERS_DB}
+  #   networks:
+  #     - mainflux-base-net
+  #   volumes:
+  #     - mainflux-users-db-volume:/var/lib/postgresql/data
 
-  users:
-    image: mainflux/users:latest
-    container_name: mainflux-users
-    volumes:
-      - ./templates/${MF_USERS_RESET_PWD_TEMPLATE}:/${MF_EMAIL_TEMPLATE}
-    depends_on:
-      - users-db
-      - auth
-    restart: on-failure
-    environment:
-      MF_USERS_LOG_LEVEL: ${MF_USERS_LOG_LEVEL}
-      MF_USERS_DB_HOST: users-db
-      MF_USERS_DB_PORT: ${MF_USERS_DB_PORT}
-      MF_USERS_DB_USER: ${MF_USERS_DB_USER}
-      MF_USERS_DB_PASS: ${MF_USERS_DB_PASS}
-      MF_USERS_DB: ${MF_USERS_DB}
-      MF_USERS_HTTP_PORT: ${MF_USERS_HTTP_PORT}
-      MF_JAEGER_URL: ${MF_JAEGER_URL}
-      MF_EMAIL_HOST: ${MF_EMAIL_HOST}
-      MF_EMAIL_PORT: ${MF_EMAIL_PORT}
-      MF_EMAIL_USERNAME: ${MF_EMAIL_USERNAME}
-      MF_EMAIL_PASSWORD: ${MF_EMAIL_PASSWORD}
-      MF_EMAIL_FROM_ADDRESS: ${MF_EMAIL_FROM_ADDRESS}
-      MF_EMAIL_FROM_NAME: ${MF_EMAIL_FROM_NAME}
-      MF_EMAIL_TEMPLATE: ${MF_EMAIL_TEMPLATE}
-      MF_TOKEN_RESET_ENDPOINT: ${MF_TOKEN_RESET_ENDPOINT}
-      MF_AUTH_GRPC_URL: ${MF_AUTH_GRPC_URL}
-      MF_AUTH_GRPC_TIMEOUT: ${MF_AUTH_GRPC_TIMEOUT}
-      MF_USERS_ADMIN_EMAIL: ${MF_USERS_ADMIN_EMAIL}
-      MF_USERS_ADMIN_PASSWORD: ${MF_USERS_ADMIN_PASSWORD}
-    ports:
-      - ${MF_USERS_HTTP_PORT}:${MF_USERS_HTTP_PORT}
-    networks:
-      - mainflux-base-net
+  # users:
+  #   image: mainflux/users:latest
+  #   container_name: mainflux-users
+  #   volumes:
+  #     - ./templates/${MF_USERS_RESET_PWD_TEMPLATE}:/${MF_EMAIL_TEMPLATE}
+  #   depends_on:
+  #     - users-db
+  #     - auth
+  #   restart: on-failure
+  #   environment:
+  #     MF_USERS_LOG_LEVEL: ${MF_USERS_LOG_LEVEL}
+  #     MF_USERS_DB_HOST: users-db
+  #     MF_USERS_DB_PORT: ${MF_USERS_DB_PORT}
+  #     MF_USERS_DB_USER: ${MF_USERS_DB_USER}
+  #     MF_USERS_DB_PASS: ${MF_USERS_DB_PASS}
+  #     MF_USERS_DB: ${MF_USERS_DB}
+  #     MF_USERS_HTTP_PORT: ${MF_USERS_HTTP_PORT}
+  #     MF_JAEGER_URL: ${MF_JAEGER_URL}
+  #     MF_EMAIL_HOST: ${MF_EMAIL_HOST}
+  #     MF_EMAIL_PORT: ${MF_EMAIL_PORT}
+  #     MF_EMAIL_USERNAME: ${MF_EMAIL_USERNAME}
+  #     MF_EMAIL_PASSWORD: ${MF_EMAIL_PASSWORD}
+  #     MF_EMAIL_FROM_ADDRESS: ${MF_EMAIL_FROM_ADDRESS}
+  #     MF_EMAIL_FROM_NAME: ${MF_EMAIL_FROM_NAME}
+  #     MF_EMAIL_TEMPLATE: ${MF_EMAIL_TEMPLATE}
+  #     MF_TOKEN_RESET_ENDPOINT: ${MF_TOKEN_RESET_ENDPOINT}
+  #     MF_AUTH_GRPC_URL: ${MF_AUTH_GRPC_URL}
+  #     MF_AUTH_GRPC_TIMEOUT: ${MF_AUTH_GRPC_TIMEOUT}
+  #     MF_USERS_ADMIN_EMAIL: ${MF_USERS_ADMIN_EMAIL}
+  #     MF_USERS_ADMIN_PASSWORD: ${MF_USERS_ADMIN_PASSWORD}
+  #   ports:
+  #     - ${MF_USERS_HTTP_PORT}:${MF_USERS_HTTP_PORT}
+  #   networks:
+  #     - mainflux-base-net
 
   ## THINGS SERVICE
   things-db:
@@ -195,7 +197,6 @@ services:
     container_name: mainflux-things
     depends_on:
       - things-db
-      - auth
     restart: on-failure
     environment:
       MF_THINGS_LOG_LEVEL: ${MF_THINGS_LOG_LEVEL}
