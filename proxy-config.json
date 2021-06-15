@@ -1,4 +1,12 @@
 {
+  "/api/*": {
+     "target": "http://localhost",
+     "secure": false,
+     "logLevel": "debug",
+     "pathRewrite": {
+         "^/api": ""
+    }
+  },
   "/password/*": {
     "target": "http://localhost:8180",
     "secure": false

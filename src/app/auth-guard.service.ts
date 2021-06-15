@@ -15,7 +15,7 @@ export class AuthGuard implements CanActivate {
           .pipe(
             tap(authenticated => {
               if (!authenticated) {
-                this.router.navigate(['oauth2']);
+                this.router.navigate(['/api/tokens']);
               }
             }),
         );
