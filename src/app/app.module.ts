@@ -27,13 +27,7 @@ import {
 
 // MFx- Foorm dependency
 import { FormsModule } from '@angular/forms';
-// Mfx - MQTT dependencies for Gateways page
-import { MqttModule, IMqttServiceOptions, MqttService } from 'ngx-mqtt';
-import { environment } from 'environments/environment';
-export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  connectOnCreate: false,
-  url: environment.mqttWsUrl,
-};
+
 // Mfx - Auth and Profile pages
 import { LogoutComponent } from './pages/logout/logout.component';
 import { RegisterComponent } from './pages/register/register.component';
@@ -66,7 +60,6 @@ import { ProfileComponent } from './pages/profile/profile.component';
     }),
     CoreModule.forRoot(),
     // Mfx dependencies
-    MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
     FormsModule,
     NbInputModule,
     NbCardModule,
@@ -75,7 +68,6 @@ import { ProfileComponent } from './pages/profile/profile.component';
   ],
   bootstrap: [AppComponent],
   // Mfx dependencies
-  providers: [MqttService],
 })
 export class AppModule {
 }

@@ -12,7 +12,6 @@ import { LoraService } from './services/lora/lora.service';
 import { OpcuaService } from './services/opcua/opcua.service';
 import { OpcuaStore } from 'app/common/store/opcua.store';
 import { MessagesService } from './services/messages/messages.service';
-import { MqttManagerService } from './services/mqtt/mqtt.manager.service';
 import { NotificationsService } from './services/notifications/notifications.service';
 import { ThingsService } from './services/things/things.service';
 import { TwinsService } from './services/twins/twins.service';
@@ -33,7 +32,6 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
     OpcuaService,
     OpcuaStore,
     MessagesService,
-    MqttManagerService,
     NotificationsService,
     ThingsService,
     TwinsService,

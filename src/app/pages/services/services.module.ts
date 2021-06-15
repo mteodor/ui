@@ -14,7 +14,6 @@ import { GatewaysAddComponent } from 'app/pages/services/gateways/add/gateways.a
 import { GatewaysDetailsComponent } from 'app/pages/services/gateways/details/gateways.details.component';
 import { GatewaysInfoComponent } from 'app/pages/services/gateways/details/info/gateways.info.component';
 import { GatewaysConfigComponent } from 'app/pages/services/gateways/details/config/gateways.config.component';
-import { GatewaysXtermComponent } from 'app/pages/services/gateways/details/xterm/gateways.xterm.component';
 
 import { ConfirmationComponent } from 'app/shared/components/confirmation/confirmation.component';
 
@@ -35,7 +34,6 @@ import { ConfirmationComponent } from 'app/shared/components/confirmation/confir
     GatewaysDetailsComponent,
     GatewaysInfoComponent,
     GatewaysConfigComponent,
-    GatewaysXtermComponent,
   ],
   entryComponents: [
     ConfirmationComponent,

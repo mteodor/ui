@@ -7,7 +7,6 @@ import { ThingsService } from 'app/common/services/things/things.service';
 import { ChannelsService } from 'app/common/services/channels/channels.service';
 import { BootstrapService } from 'app/common/services/bootstrap/bootstrap.service';
 import { MessagesService } from 'app/common/services/messages/messages.service';
-import { MqttService } from 'ngx-mqtt';
 import { NotificationsService } from 'app/common/services/notifications/notifications.service';
 
 const defLimit: number = 20;
@@ -23,7 +22,6 @@ export class GatewaysService {
     private channelsService: ChannelsService,
     private bootstrapService: BootstrapService,
     private messagesService: MessagesService,
-    private mqttService: MqttService,
     private notificationsService: NotificationsService,
   ) { }
 
@@ -200,11 +198,7 @@ export class GatewaysService {
         const lon = 48 + 2 * Math.random();
         const lat = 20 + 2 * Math.random();
         const cmd = `[{"bn":"location-", "n":"lon", "v":${lon}}, {"n":"lat", "v":${lat}}]`;
-        this.mqttService.connect({
-          username: gw.id,
-          password: gw.key,
-        });
-        this.mqttService.publish(topic + '/req', cmd).subscribe();
+      
       },
     );
   }
