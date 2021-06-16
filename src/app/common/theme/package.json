@@ -1,0 +1,37 @@
+{
+  "name": "@nebular/theme",
+  "version": "7.0.0",
+  "description": "@nebular/theme",
+  "author": "akveo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akveo/nebular.git"
+  },
+  "bugs": {
+    "url": "https://github.com/akveo/nebular/issues"
+  },
+  "homepage": "https://github.com/akveo/nebular#readme",
+  "keywords": [
+    "angular",
+    "typescript",
+    "ng2-admin",
+    "ngx-admin",
+    "theme",
+    "nebular"
+  ],
+  "peerDependencies": {
+    "@angular/animations": "^11.0.0",
+    "@angular/common": "^11.0.0",
+    "@angular/core": "^11.0.0",
+    "@angular/router": "^11.0.0",
+    "@angular/cdk": "^11.0.0",
+    "rxjs": "^6.5.4",
+    "tslib": "^2.0.0"
+  },
+  "dependencies": {
+    "intersection-observer": "0.7.0"
+  },
+  "schematics": "./schematics/collection.json",
+  "sideEffects": false
+}
