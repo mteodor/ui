@@ -10,13 +10,8 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CoreModule } from './@core/core.module';
 import { ThemeModule } from './@theme/theme.module';
 import { AppComponent } from './app.component';
-import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
-import { 
-  NbAuthJWTToken,
-  NbAuthModule,
-  NB_AUTH_TOKEN_INTERCEPTOR_FILTER
-}  from '@nebular/auth';
+import { NbAuthModule, NB_AUTH_TOKEN_INTERCEPTOR_FILTER, NbAuthJWTToken } from '@nebular/auth';
 import { ApiJWTInterceptor} from './auth/token.interceptor.service'
 import { AuthGuard } from './auth-guard.service';
 
@@ -49,7 +44,6 @@ import { LogoutComponent } from './pages/logout/logout.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ProxyAuthStrategy } from './auth/strategy/proxy-strategy';
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -75,8 +69,20 @@ import { ProxyAuthStrategy } from './auth/strategy/proxy-strategy';
     NbChatModule.forRoot({
       messageGoogleMapKey: 'AIzaSyA_wNuCzia92MAmdLRzmqitRGvCF7wCZPY',
     }),
+    NbAuthModule.forRoot({
+      strategies: [
+        ProxyAuthStrategy.setup({
+          name: 'email',
+          token: {
+            class: NbAuthJWTToken ,
+            key: 'token',
+          },
+        }),
+      ],
+
+
+    }),
     
-   
     // Mfx dependencies
     CoreModule.forRoot(),
     FormsModule,
@@ -89,6 +95,7 @@ import { ProxyAuthStrategy } from './auth/strategy/proxy-strategy';
   // Mfx dependencies
   providers: [
     AuthGuard,
+    ProxyAuthStrategy,
     { provide: HTTP_INTERCEPTORS, useClass: ApiJWTInterceptor, multi: true},
     { provide: NB_AUTH_TOKEN_INTERCEPTOR_FILTER, useValue: function () { return false; }, },
   ],

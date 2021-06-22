@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { NbAuthStrategy, NbAuthResult, NbAuthStrategyClass, NbAuthIllegalTokenError } from '@nebular/auth';
 import { ProxyAuthStrategyOptions, proxyStrategyOptions } from './proxy-strategy-options';
-import { switchMap,delay, map, catchError } from 'rxjs/operators';
+import { delay, map, catchError } from 'rxjs/operators';
 
 /**
  * Dummy auth strategy. Could be useful for auth setup when backend is not available yet.
@@ -54,7 +54,7 @@ export class ProxyAuthStrategy extends NbAuthStrategy {
             res,
             this.getOption(`${module}.redirect.success`),
             [],
-            this.getOption('messages.getter')(module, res, this.options),
+            [],
             this.createToken(this.getOption('token.getter')(module, res, this.options), requireValidToken));
         }),
         catchError((res) => {

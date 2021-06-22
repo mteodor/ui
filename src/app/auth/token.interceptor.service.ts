@@ -23,8 +23,8 @@ export class ApiJWTInterceptor implements HttpInterceptor {
                   return this.authService.getToken().pipe(
                     switchMap((token: NbAuthToken) => {
                       console.log(typeof(token));
-                      // const JWT = `Bearer ` + `${token.getValue()}`;
-                      const JWT =  `${token.getValue()}`;
+                      const JWT = `Bearer ` + `${token.getValue()}`;
+                      //const JWT =  `${token.getValue()}`;
                       req = req.clone({
                         setHeaders: {
                           Authorization: JWT,

@@ -12,7 +12,7 @@ import { NbLoginComponent, NbAuthService,NbAuthResult, NB_AUTH_OPTIONS } from '@
   template: '<div></div>',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent extends NbLoginComponent  {
+export class LoginComponent extends NbLoginComponent implements OnInit {
   // user inherited
   // strategy inherited
 
@@ -23,6 +23,10 @@ export class LoginComponent extends NbLoginComponent  {
     protected router: Router,
   ) {
     super(authService, options, cd, router);
+    
+  }
+
+  ngOnInit(){
     this.login()
   }
 
@@ -42,9 +46,7 @@ export class LoginComponent extends NbLoginComponent  {
 
       const redirect = result.getRedirect();
       if (redirect) {
-        setTimeout(() => {
-          return this.router.navigateByUrl(redirect);
-        }, this.redirectDelay);
+        return this.router.navigateByUrl(redirect);
       }
       this.cd.detectChanges();
     });

@@ -30,23 +30,24 @@ export class ProfileComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log(this)
     this.picture = this.usersService.getUserPicture();
 
-    this.usersService.getProfile().subscribe(
-      resp => {
-        this.email = resp.email ? resp.email : '';
+    // this.usersService.getProfile().subscribe(
+    //   resp => {
+    //     this.email = resp.email ? resp.email : '';
 
-        if (resp.metadata !== undefined) {
-          this.firstName = resp.metadata.firstName ? resp.metadata.firstName : '';
-          this.lastName = resp.metadata.lastName ? resp.metadata.lastName : '';
-          this.phone = resp.metadata.phone ? resp.metadata.phone : '';
-          this.company = resp.metadata.company ? resp.metadata.company : '';
-          this.department = resp.metadata.department ? resp.metadata.department : '';
-          this.occupation = resp.metadata.occupation ? resp.metadata.occupation : '';
-          this.location = resp.metadata.location ? resp.metadata.location : '';
-        }
-      },
-    );
+    //     if (resp.metadata !== undefined) {
+    //       this.firstName = resp.metadata.firstName ? resp.metadata.firstName : '';
+    //       this.lastName = resp.metadata.lastName ? resp.metadata.lastName : '';
+    //       this.phone = resp.metadata.phone ? resp.metadata.phone : '';
+    //       this.company = resp.metadata.company ? resp.metadata.company : '';
+    //       this.department = resp.metadata.department ? resp.metadata.department : '';
+    //       this.occupation = resp.metadata.occupation ? resp.metadata.occupation : '';
+    //       this.location = resp.metadata.location ? resp.metadata.location : '';
+    //     }
+    //   },
+    // );
   }
 
   onClickSaveInfos(event): void {

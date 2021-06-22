@@ -9,10 +9,10 @@ import {
   NbResetPasswordComponent,
 } from '@nebular/auth';
 
+import { ProxyStrategyModule } from './auth/strategy/proxy-strategy-options';
+
 // Mfx- Custom Logout and Register components that
 // replace NbLogoutComponent and NbRegisterComponent
-import { LogoutComponent } from '../app/pages/logout/logout.component';
-import { RegisterComponent } from '../app/pages/register/register.component';
 
 export const routes: Routes = [
   {
@@ -23,33 +23,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
-    component: NbAuthComponent,
-    children: [
-      {
-        path: '',
-        component: NbLoginComponent,
-      },
-      {
-        path: 'login',
-        component: NbLoginComponent,
-      },
-      {
-        path: 'register',
-        component: RegisterComponent,
-      },
-      {
-        path: 'logout',
-        component: LogoutComponent,
-      },
-      {
-        path: 'request-password',
-        component: NbRequestPasswordComponent,
-      },
-      {
-        path: 'reset-password',
-        component: NbResetPasswordComponent,
-      },
-    ],
+    loadChildren: () => import('./auth/proxy-auth.module').then(m => m.ProxyAuthModule),
   },
   { path: '', redirectTo: 'pages', pathMatch: 'full' },
   { path: '**', redirectTo: 'pages' },
@@ -57,6 +31,7 @@ export const routes: Routes = [
 
 const config: ExtraOptions = {
   useHash: false,
+  enableTracing: true ,
 };
 
 @NgModule({
