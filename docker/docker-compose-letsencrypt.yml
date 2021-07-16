@@ -1,0 +1,61 @@
+# Copyright (c) Mainflux
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.7"
+
+networks:
+  mainflux-base-net:
+    driver: bridge
+
+services:
+  ui:
+    image: mainflux/ui:latest
+    container_name: mainflux-ui
+    restart: on-failure
+    volumes:
+      - ./nginx/entrypoint-ui.sh:/entrypoint.sh
+    ports:
+      - ${MF_UI_PORT}:${MF_UI_PORT}
+    networks:
+      - mainflux-base-net
+    environment:
+      MF_UI_PORT: ${MF_UI_PORT}
+      MF_UI_MQTT_WS_URL: ${MF_UI_MQTT_WS_URL}
+    command: /entrypoint.sh
+
+  nginx:
+    image: nginx:1.16.0-alpine
+    container_name: mainflux-nginx
+    restart: on-failure
+    volumes:
+      - ./nginx/nginx-x509-letsencrypt.conf:/etc/nginx/nginx.conf.template
+      - ./nginx/entrypoint.sh:/entrypoint.sh
+      - ./nginx/snippets:/etc/nginx/snippets
+      - ./ssl/authorization.js:/etc/nginx/authorization.js
+      - ./ssl/certs/mainflux-server.crt:/etc/ssl/certs/mainflux-server.crt
+      - ./ssl/certs/ca.crt:/etc/ssl/certs/ca.crt
+      - ./ssl/certs/mainflux-server.key:/etc/ssl/private/mainflux-server.key
+      - ./ssl/dhparam.pem:/etc/ssl/certs/dhparam.pem
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    ports:
+      - ${MF_NGINX_HTTP_PORT}:${MF_NGINX_HTTP_PORT}
+      - ${MF_NGINX_SSL_PORT}:${MF_NGINX_SSL_PORT}
+      - ${MF_NGINX_MQTT_PORT}:${MF_NGINX_MQTT_PORT}
+      - ${MF_NGINX_MQTTS_PORT}:${MF_NGINX_MQTTS_PORT}
+    networks:
+      - mainflux-base-net
+    env_file:
+      - ../.env
+    command: /entrypoint.sh
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    networks:
+      - mainflux-base-net
+    depends_on:
+      - nginx
+
