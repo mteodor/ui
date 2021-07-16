@@ -66,6 +66,8 @@ export interface SenMLRec {
   t: number;
   u: string;
   v: number;
+  vd: number;
+  vb: number;
   vs: string;
 }
 
@@ -95,14 +97,17 @@ export interface MsgFilters {
   publisher?: string;
   subtopic?: string;
   name?: string;
-  value?: string;
+  v?: string;
+  vs?: string;
+  vd?: string;
+  vb?: string;
   from?: number;
   to?: number;
 }
 
 export interface ReaderUrl {
   prefix?: string;
-  sufix?: string;
+  suffix?: string;
 }
 
 export interface Message {

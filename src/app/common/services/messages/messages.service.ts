@@ -28,19 +28,14 @@ export class MessagesService {
       'Authorization': thingKey,
     });
 
-    const prefix = readerUrl.prefix ?
-      `${environment.readerUrl}/${readerUrl.prefix}` :
-      `${environment.readerUrl}/${environment.readerPrefix}`;
-    const sufix  = readerUrl.sufix || environment.readerSufix;
+    const prefix  = readerUrl ? readerUrl.prefix : environment.readerPrefix;
+    const suffix  = readerUrl ? readerUrl.suffix : environment.readerSuffix;
 
-    let url = `${prefix}/${channel}/${sufix}`;
-    url += `?offset=${filters.offset}&limit=${filters.limit}`;
-    url = filters.publisher ? url += `&publisher=${filters.publisher}` : url;
-    url = filters.subtopic ? url += `&subtopic=${encodeURIComponent(filters.subtopic)}` : url;
-    url = filters.name ? url += `&name=${filters.name}` : url;
-    url = filters.value ? url += `&v=${filters.value}` : url;
-    url = filters.from ? url += `&from=${filters.from}` : url;
-    url = filters.to ? url += `&to=${filters.to}` : url;
+    let url = `${environment.readerUrl}/${prefix}/${channel}/${suffix}?`;
+
+    Object.keys(filters).forEach(key => {
+      url = filters[key] ? url += `&${key}=${filters[key]}` : url;
+    });
 
     return this.http.get(url, { headers: headers })
       .map(
@@ -62,7 +57,7 @@ export class MessagesService {
       'Authorization': key,
     });
 
-    let url = `${environment.httpAdapterUrl}/${environment.readerPrefix}/${channel}/${environment.readerSufix}`;
+    let url = `${environment.httpAdapterUrl}/${environment.readerPrefix}/${channel}/${environment.readerSuffix}`;
     url = subtopic ? url += `/${encodeURIComponent(subtopic)}` : url;
 
     return this.http.post(url, msg, { headers: headers })

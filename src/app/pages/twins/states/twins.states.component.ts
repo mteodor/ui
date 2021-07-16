@@ -1,11 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
+import { IntervalService } from 'app/common/services/interval/interval.service';
 import { TwinsService } from 'app/common/services/twins/twins.service';
-import { Twin } from 'app/common/interfaces/mainflux.interface';
-import { LocalDataSource } from 'ng2-smart-table';
-import { TwinsPayloadComponent } from './payload/twins.payload.component';
-import { isNumber } from 'util';
+import { Twin, TableConfig, TablePage, PageFilters } from 'app/common/interfaces/mainflux.interface';
 
 @Component({
   selector: 'ngx-twins-states-component',
@@ -13,59 +11,25 @@ import { isNumber } from 'util';
   styleUrls: ['./twins.states.component.scss'],
 })
 export class TwinsStatesComponent implements OnInit, OnDestroy {
-  settings = {
-    actions: {
-      add: false,
-      edit: false,
-      delete: false,
-    },
-    columns: {
-      id: {
-        title: 'ID',
-        width: '3%',
-      },
-      definition: {
-        title: 'Definition',
-        width: '3%',
-      },
-      created: {
-        title: 'Created',
-        valuePrepareFunction: (cell, row) => {
-          const date = new Date(row.created);
-          return date.toUTCString();
-        },
-      },
-      payload: {
-        title: 'Payload',
-        type: 'custom',
-        renderComponent: TwinsPayloadComponent,
-        valuePrepareFunction: (cell, row) => {
-          return row;
-        },
-        filter: false,
-      },
-    },
-    pager: {
-      display: true,
-      perPage: 10,
-    },
-  };
-
-  offset = 0;
-  limit = 10;
   lowerLimit = 0;
   upperLimit = 10;
   interval = 5 * 1000;
   intervalID: number;
 
   twin: Twin = {};
-  states: any[] = [];
-  total: number = 0;
-  source: LocalDataSource = new LocalDataSource();
+
+  twinID: string = '';
+  tableConfig: TableConfig = {
+    colNames: ['ID', 'Definition', 'Created', 'Payload'],
+    keys: ['id', 'definition', 'created', 'payload'],
+  };
+  page: TablePage = {};
+  pageFilters: PageFilters = {};
 
   constructor(
     private route: ActivatedRoute,
     private twinsService: TwinsService,
+    private intervalService: IntervalService,
   ) { }
 
   ngOnInit() {
@@ -77,51 +41,34 @@ export class TwinsStatesComponent implements OnInit, OnDestroy {
     this.twinsService.getTwin(id).subscribe(
       (resp: Twin) => {
         this.twin = resp;
-        this.getLastStates();
-        this.intervalID = window.setInterval(() => {
-          this.twinsService.listStates(this.twin.id, 0, 0).subscribe(
-            (states: any) => {
-              this.total = states.total;
-            });
-        }, this.interval);
-      },
-    );
-  }
-
-  getLastStates() {
-    this.twinsService.listStates(this.twin.id, this.offset, this.limit).subscribe(
-      (states: any) => {
-        this.offset = states.total - this.limit;
-        this.offset = Math.max(0, this.offset);
-
-        this.lowerLimit = this.offset + 1;
-        this.upperLimit = this.offset + this.limit;
-
         this.getStates();
+        this.intervalService.set(this, this.getStates, this.interval);
       },
     );
   }
 
   getStates() {
-    this.twinsService.listStates(this.twin.id, this.offset, this.limit).subscribe(
-      (states: any) => {
-        this.total = states.total;
-        this.states = states.states;
-        this.source.load(this.states);
-        this.source.refresh();
+    this.twinsService.listStates(this.twin.id, this.pageFilters.offset, this.pageFilters.limit).subscribe(
+      (resp: any) => {
+        this.page = {
+          offset: resp.offset,
+          limit: resp.limit,
+          total: resp.total,
+          rows: resp.states,
+        };
       },
     );
   }
 
   lower($event) {
     const val = +$event.srcElement.value;
-    if (isNumber(val)) {
+    if (Number.isInteger(val)) {
       this.lowerLimit = val;
 
-      this.offset = val - 1;
-      this.offset = Math.max(0, this.offset);
-      this.limit = this.upperLimit - this.offset;
-      this.limit = Math.max(0, this.limit);
+      this.pageFilters.offset = val - 1;
+      this.pageFilters.offset = Math.max(0, this.pageFilters.offset);
+      this.pageFilters.limit = this.upperLimit - this.pageFilters.offset;
+      this.pageFilters.limit = Math.max(0, this.pageFilters.limit);
 
       this.getStates();
     }
@@ -130,20 +77,34 @@ export class TwinsStatesComponent implements OnInit, OnDestroy {
   upper($event) {
     const val = +$event.srcElement.value;
 
-    if (isNumber(val)) {
+    if (Number.isInteger(val)) {
       this.upperLimit = val;
 
-      this.limit = val - this.offset;
-      this.limit = Math.max(0, this.limit);
-      this.offset = this.lowerLimit - 1;
-      this.offset = Math.max(0, this.offset);
+      this.pageFilters.limit = val - this.pageFilters.offset;
+      this.pageFilters.limit = Math.max(0, this.pageFilters.limit);
+      this.pageFilters.offset = this.lowerLimit - 1;
+      this.pageFilters.offset = Math.max(0, this.pageFilters.offset);
 
       this.getStates();
     }
   }
 
-  ngOnDestroy() {
-    window.clearInterval(this.intervalID);
+  onChangePage(dir: any) {
+    if (dir === 'prev') {
+      this.pageFilters.offset = this.page.offset - this.page.limit;
+    }
+    if (dir === 'next') {
+      this.pageFilters.offset = this.page.offset + this.page.limit;
+    }
+    this.getStates();
   }
 
+  onChangeLimit(lim: number) {
+    this.pageFilters.limit = lim;
+    this.getStates();
+  }
+
+  ngOnDestroy() {
+    this.intervalService.clear();
+  }
 }

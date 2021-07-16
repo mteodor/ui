@@ -9,7 +9,7 @@ import { FsService } from 'app/common/services/fs/fs.service';
 import { ConfirmationComponent } from 'app/shared/components/confirmation/confirmation.component';
 import { ChannelsAddComponent } from './add/channels.add.component';
 
-const defSearchBardMs: number = 100;
+const defSearchBarMs: number = 100;
 
 @Component({
   selector: 'ngx-smart-table',
@@ -22,7 +22,7 @@ export class ChannelsComponent implements OnInit {
     colNames: ['', '', '', 'Name', 'Type', 'ID'],
     keys: ['edit', 'delete', 'details', 'name', 'type', 'id'],
   };
-  channelsPage: TablePage = {};
+  page: TablePage = {};
   pageFilters: PageFilters = {};
 
   searchTime = 0;
@@ -44,7 +44,7 @@ export class ChannelsComponent implements OnInit {
     this.pageFilters.name = name;
     this.channelsService.getChannels(this.pageFilters).subscribe(
       (resp: any) => {
-        this.channelsPage = {
+        this.page = {
           offset: resp.offset,
           limit: resp.limit,
           total: resp.total,
@@ -52,7 +52,7 @@ export class ChannelsComponent implements OnInit {
         };
 
         // Check if there is a type defined in the metadata
-        this.channelsPage.rows.forEach( (chan: Channel) => {
+        this.page.rows.forEach( (chan: Channel) => {
           chan.type = chan.metadata ? chan.metadata.type : '';
         });
       },
@@ -61,10 +61,10 @@ export class ChannelsComponent implements OnInit {
 
   onChangePage(dir: any) {
     if (dir === 'prev') {
-      this.pageFilters.offset = this.channelsPage.offset - this.channelsPage.limit;
+      this.pageFilters.offset = this.page.offset - this.page.limit;
     }
     if (dir === 'next') {
-      this.pageFilters.offset = this.channelsPage.offset + this.channelsPage.limit;
+      this.pageFilters.offset = this.page.offset + this.page.limit;
     }
     this.getChannels();
   }
@@ -75,7 +75,7 @@ export class ChannelsComponent implements OnInit {
   }
 
   openAddModal() {
-    this.dialogService.open(ChannelsAddComponent, { context: { action: 'Add' } }).onClose.subscribe(
+    this.dialogService.open(ChannelsAddComponent, { context: { action: 'Create' } }).onClose.subscribe(
       confirm => {
         if (confirm) {
           this.getChannels();
@@ -100,7 +100,7 @@ export class ChannelsComponent implements OnInit {
         if (confirm) {
           this.channelsService.deleteChannel(row.id).subscribe(
             resp => {
-              this.channelsPage.rows = this.channelsPage.rows.filter((c: Channel) => c.id !== row.id);
+              this.page.rows = this.page.rows.filter((c: Channel) => c.id !== row.id);
               this.notificationsService.success('Channel successfully deleted', '');
             },
           );
@@ -117,14 +117,14 @@ export class ChannelsComponent implements OnInit {
 
   searchChannel(input) {
     const t = new Date().getTime();
-    if ((t - this.searchTime) > defSearchBardMs) {
+    if ((t - this.searchTime) > defSearchBarMs) {
       this.getChannels(input);
       this.searchTime = t;
     }
   }
 
   onClickSave() {
-    this.fsService.exportToCsv('mfx_channels.csv', this.channelsPage.rows);
+    this.fsService.exportToCsv('mfx_channels.csv', this.page.rows);
   }
 
   onFileSelected(files: FileList) {

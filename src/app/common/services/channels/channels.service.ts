@@ -211,12 +211,12 @@ export class ChannelsService {
 
   disconnectedThings(chanID: string, offset?: number, limit?: number) {
     offset = offset || 0;
-    limit = limit || defLimit;
+    limit = limit || defConnLimit;
 
     const params = new HttpParams()
       .set('offset', offset.toString())
       .set('limit', limit.toString())
-      .set('connected', 'false');
+      .set('disconnected', 'true');
 
     return this.http.get(`${environment.channelsUrl}/${chanID}/things`, { params })
     .map(

@@ -39,7 +39,7 @@ services:
     command: /entrypoint.sh
 
   nginx:
-    image: nginx:1.16.0-alpine
+    image: nginx:1.20.0-alpine
     container_name: mainflux-nginx
     restart: on-failure
     volumes:
@@ -61,7 +61,7 @@ services:
     networks:
       - mainflux-base-net
     env_file:
-      - ../.env
+      - .env
     command: /entrypoint.sh
     depends_on:
       - things
@@ -80,7 +80,7 @@ services:
       - nginx
 
   nats:
-    image: nats:1.3.0
+    image: nats:2.2.4-alpine
     container_name: mainflux-nats
     command: "-c /etc/nats/nats.conf"
     restart: on-failure
@@ -146,7 +146,7 @@ services:
     image: mainflux/users:latest
     container_name: mainflux-users
     volumes:
-      - ./users/emailer/templates/${MF_EMAIL_TEMPLATE}:/${MF_EMAIL_TEMPLATE}
+      - ./templates/${MF_USERS_RESET_PWD_TEMPLATE}:/${MF_EMAIL_TEMPLATE}
     depends_on:
       - users-db
       - auth
@@ -160,7 +160,6 @@ services:
       MF_USERS_DB: ${MF_USERS_DB}
       MF_USERS_HTTP_PORT: ${MF_USERS_HTTP_PORT}
       MF_JAEGER_URL: ${MF_JAEGER_URL}
-      MF_EMAIL_DRIVER: ${MF_EMAIL_DRIVER}
       MF_EMAIL_HOST: ${MF_EMAIL_HOST}
       MF_EMAIL_PORT: ${MF_EMAIL_PORT}
       MF_EMAIL_USERNAME: ${MF_EMAIL_USERNAME}
@@ -220,7 +219,6 @@ services:
       MF_THINGS_HTTP_PORT: ${MF_THINGS_HTTP_PORT}
       MF_THINGS_AUTH_HTTP_PORT: ${MF_THINGS_AUTH_HTTP_PORT}
       MF_THINGS_AUTH_GRPC_PORT: ${MF_THINGS_AUTH_GRPC_PORT}
-      MF_THINGS_SECRET: ${MF_THINGS_SECRET}
       MF_JAEGER_URL: ${MF_JAEGER_URL}
       MF_AUTH_GRPC_URL: ${MF_AUTH_GRPC_URL}
       MF_AUTH_GRPC_TIMEOUT: ${MF_AUTH_GRPC_TIMEOUT}
@@ -232,7 +230,7 @@ services:
       - mainflux-base-net
 
   jaeger:
-    image: jaegertracing/all-in-one:1.13
+    image: jaegertracing/all-in-one:1.20
     container_name: mainflux-jaeger
     ports:
       - ${MF_JAEGER_PORT}:${MF_JAEGER_PORT}/udp
@@ -271,6 +269,7 @@ services:
       MF_NATS_URL: ${MF_NATS_URL}
       MF_MQTT_ADAPTER_MQTT_TARGET_HOST: vernemq
       MF_MQTT_ADAPTER_MQTT_TARGET_PORT: ${MF_MQTT_BROKER_PORT}
+      MF_MQTT_ADAPTER_MQTT_TARGET_HEALTH_CHECK: http://vernemq:8888/health
       MF_MQTT_ADAPTER_WS_TARGET_HOST: vernemq
       MF_MQTT_ADAPTER_WS_TARGET_PORT: ${MF_MQTT_BROKER_WS_PORT}
       MF_JAEGER_URL: ${MF_JAEGER_URL}
@@ -301,7 +300,7 @@ services:
       - mainflux-base-net
 
   es-redis:
-    image: redis:5.0-alpine
+    image: redis:6.2.2-alpine
     container_name: mainflux-es-redis
     restart: on-failure
     networks:
@@ -311,7 +310,7 @@ services:
 
   ## OPC-UA ADAPTER
   opcua-redis:
-    image: redis:5.0-alpine
+    image: redis:6.2.2-alpine
     container_name: mainflux-opcua-redis
     restart: on-failure
     networks:
@@ -349,7 +348,7 @@ services:
 
   ## INFLUX DB
   influxdb:
-    image: influxdb:1.8.3
+    image: influxdb:1.8.5
     container_name: mainflux-influxdb
     restart: on-failure
     environment:
@@ -400,6 +399,7 @@ services:
       - mainflux-base-net
     volumes:
       - mainflux-grafana-volume:/var/lib/grafana
+      - ./configs/grafana-defaults.ini:/usr/share/grafana/conf/defaults.ini
 
   influxdb-reader:
     image: mainflux/influxdb-reader:latest
@@ -425,35 +425,9 @@ services:
     volumes:
       - ../../ssl/certs:/etc/ssl/certs
 
-  ## LORA ADAPTER
-  lora-redis:
-    image: redis:5.0-alpine
-    container_name: mainflux-lora-redis
-    restart: on-failure
-    networks:
-      - mainflux-base-net
-
-  lora-adapter:
-    image: mainflux/lora:latest
-    container_name: mainflux-lora
-    depends_on:
-      - nats
-    restart: on-failure
-    environment:
-      MF_LORA_ADAPTER_LOG_LEVEL: ${MF_LORA_ADAPTER_LOG_LEVEL}
-      MF_THINGS_ES_URL: es-redis:${MF_REDIS_TCP_PORT}
-      MF_LORA_ADAPTER_ROUTE_MAP_URL: lora-redis:${MF_REDIS_TCP_PORT}
-      MF_LORA_ADAPTER_MESSAGES_URL: ${MF_LORA_ADAPTER_MESSAGES_URL}
-      MF_LORA_ADAPTER_HTTP_PORT: ${MF_LORA_ADAPTER_HTTP_PORT}
-      MF_NATS_URL: ${MF_NATS_URL}
-    ports:
-      - ${MF_LORA_ADAPTER_HTTP_PORT}:${MF_LORA_ADAPTER_HTTP_PORT}
-    networks:
-      - mainflux-base-net
-
   ## BOOTSTRAP
   bootstrap-db:
-    image: postgres:13.1-alpine
+    image: postgres:13.3-alpine
     container_name: mainflux-bootstrap-db
     restart: on-failure
     environment:
@@ -559,9 +533,11 @@ services:
       MF_TWINS_DB_PORT: ${MF_TWINS_DB_PORT}
       MF_TWINS_CHANNEL_ID: ${MF_TWINS_CHANNEL_ID}
       MF_NATS_URL: ${MF_NATS_URL}
-      MF_TWINS_MQTT_URL: ${MF_TWINS_MQTT_URL}
       MF_AUTH_GRPC_URL: ${MF_AUTH_GRPC_URL}
       MF_AUTH_GRPC_TIMEOUT: ${MF_AUTH_GRPC_TIMEOUT}
+      MF_TWINS_CACHE_URL: ${MF_TWINS_CACHE_URL}
+      MF_TWINS_CACHE_PASS: ${MF_TWINS_CACHE_PASS}
+      MF_TWINS_CACHE_DB: ${MF_TWINS_CACHE_DB}
     ports:
       - ${MF_TWINS_HTTP_PORT}:${MF_TWINS_HTTP_PORT}
     networks:

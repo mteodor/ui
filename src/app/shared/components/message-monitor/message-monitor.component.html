@@ -1,22 +1,22 @@
 <nb-card size="large">
-  <nb-card-header class="header-details">
+  <nb-card-header class="card-header">
     <div class="row">
       <div class="col-2">
         Messages Reader:
       </div>
-      <div *ngIf="mode == 'json'" class="col-1 info-details">
+      <div *ngIf="mode == 'json'" class="col-1 form-key">
         Prefix:
       </div>
       <div *ngIf="mode == 'json'" class="col-2">
         <input nbInput fullWidth fieldSize="tiny"
                [(ngModel)]='readerUrl.prefix'>
       </div>
-      <div *ngIf="mode == 'json'" class="col-1 info-details">
+      <div *ngIf="mode == 'json'" class="col-1 form-key">
         Suffix:
       </div>
       <div *ngIf="mode == 'json'" class="col-2">
         <input nbInput fullWidth fieldSize="tiny"
-               [(ngModel)]='readerUrl.sufix'>
+               [(ngModel)]='readerUrl.suffix'>
       </div>
       <div class="col">
         <nb-select class="right" [(selected)]="mode" size="tiny">
@@ -29,9 +29,7 @@
     <div [ngSwitch]="mode">
       <div *ngSwitchCase="'table'">
         <ngx-table-component [config]="tableConfig"
-                             [page]="messagesPage"
-                             (changeLimitEvent)=onChangeLimit($event)
-                             (changePageEvent)=onChangePage($event)>
+                             [page]="messagesPage">
         </ngx-table-component>
       </div>
       <div *ngSwitchCase="'json'">
@@ -45,8 +43,14 @@
     </div>
   </nb-card-body>
   <nb-card-footer>
+    <div>
+      <ngx-pagination-component [page]="messagesPage"
+                                (changeLimitEvent)=onChangeLimit($event)
+                                (changePageEvent)=onChangePage($event)>
+      </ngx-pagination-component>
+    </div>
     <div class="row form-row">
-      <div class="col-1 info-details">
+      <div class="col-1 form-key">
         Channels:
       </div>
       <div class="col-4">
@@ -54,14 +58,14 @@
           <nb-option *ngFor="let ch of channels" [value]="ch.id">{{ch.id}}</nb-option>
         </nb-select>
       </div>
-      <div class="col-1 info-details">
+      <div class="col-1 form-key">
         Subtopic:
       </div>
       <div class="col-2">
         <input nbInput fullWidth fieldSize="tiny"
                [(ngModel)]='filters.subtopic'>
       </div>
-      <div class="col-1 info-details">
+      <div class="col-1 form-key">
         Time:
       </div>
       <div class="col-2">
@@ -70,7 +74,7 @@
       </div>
     </div>
     <div class="row form-row">
-      <div class="col-1 info-details">
+      <div class="col-1 form-key">
         Publisher:
       </div>
       <div class="col-4">
@@ -78,23 +82,23 @@
           <nb-option *ngFor="let pub of publishers" [value]="pub.id">{{pub.id}}</nb-option>
         </nb-select>
       </div>
-      <div class="col-1 info-details">
+      <div class="col-1 form-key">
         Name:
       </div>
       <div class="col-2">
         <input nbInput fullWidth fieldSize="tiny"
                [(ngModel)]='filters.name'>
       </div>
-      <div class="col-1 info-details">
+      <div class="col-1 form-key">
         Value:
       </div>
       <div class="col-2">
         <input nbInput fullWidth fieldSize="tiny"
-               [(ngModel)]='filters.value'>
+               [(ngModel)]='httpAdaptVal'>
       </div>
       <div class="col-1">
-        <nb-select class="right" [(selected)]="valType" size="tiny">
-          <nb-option *ngFor="let type of this.valTypes" [value]="type">{{type}}</nb-option>
+        <nb-select class="right" [(selected)]="httpAdaptType" size="tiny">
+          <nb-option *ngFor="let type of this.httpAdaptTypes" [value]="type">{{type}}</nb-option>
         </nb-select>
       </div>
     </div>

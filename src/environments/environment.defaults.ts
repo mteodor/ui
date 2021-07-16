@@ -1,6 +1,7 @@
 export const environment = {
   usersUrl: '/users',
   groupsUrl: '/groups',
+  membersUrl: '/members',
   usersVersionUrl: '/version',
   loginUrl: '/tokens',
   requestPassUrl: '/password/reset-request',
@@ -18,7 +19,7 @@ export const environment = {
   httpAdapterUrl: '/http',
   readerUrl: '/reader',
   readerPrefix: 'channels',
-  readerSufix: 'messages',
+  readerSuffix: 'messages',
 
   mqttWsUrl: window['env']['mqttWsUrl'] || 'ws://localhost/mqtt',
   exportConfigFile: '/configs/export/config.toml',

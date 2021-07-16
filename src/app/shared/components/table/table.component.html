@@ -3,55 +3,49 @@
     <th *ngFor="let colName of config.colNames"> {{ colName }} </th>
   </tr>
   <tr *ngFor="let row of page.rows">
-      <td  *ngFor="let key of config.keys">
-        <div *ngIf="key === 'edit'" class="edit-button">
+    <td  *ngFor="let key of config.keys">
+      <div [ngSwitch]="key">
+        <div *ngSwitchCase="'edit'" class="edit-button">
           <nb-icon nbButton size="tiny" icon="edit-outline"
                    (click)="onEdit(row)">
           </nb-icon>
         </div>
-        <div *ngIf="key === 'delete'" class="del-button">
+        <div *ngSwitchCase="'delete'" class="del-button">
           <nb-icon nbButton size="tiny" icon="trash-2-outline"
                    (click)="onDelete(row)">
           </nb-icon>
         </div>
-        <div *ngIf="key === 'details'" class="del-button">
-          <nb-icon nbButton size="tiny" icon="search-outline" status="warning"
+        <div *ngSwitchCase="'details'" class="detail-button">
+          <nb-icon nbButton size="tiny" icon="search-outline"
                    (click)="onClickDetails(row)">
           </nb-icon>
         </div>
-        <div *ngIf="key === 'time'">
-          {{ row[key] * 1000 | date:'medium' }}
+        <div *ngSwitchCase="'checkbox'">
+          <nb-checkbox (checkedChange)="onToggleCheckbox(row)"></nb-checkbox>
         </div>
-        <div *ngIf="key !== 'time' && key !== 'edit' && key !== 'delete' && key !== 'details'">
-          {{ row[key] }}
+        <div *ngSwitchCase="'time'">
+          {{ row[key] | toMillisecs | date:'medium' }}
         </div>
-      </td>
+        <div *ngSwitchCase="'created'">
+          {{ row[key] | date:'long' }}
+        </div>
+        <div *ngSwitchDefault>
+          <div [ngSwitch]="isObject(row[key])">
+            <div *ngSwitchCase="true">
+              <pre>{{row[key] | json}}</pre>
+            </div>
+            <div *ngSwitchDefault>
+              {{ row[key] }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </td>
   </tr>
 </table>
 
-<div *ngIf="page.total === 0" class="row no-msg">
+<div *ngIf="!page.total" class="row no-msg">
   <div class="col-12">
     No content
-  </div>
-</div>
-
-<div class="row">
-  <div  *ngIf="page.total > 0" class="col-1">
-    <nb-select size="tiny" [(selected)]="page.limit" (selectedChange)="onChangeLimit($event)">
-      <nb-option *ngFor="let lim of limits" [value]="lim"> {{ lim }} </nb-option>
-    </nb-select>
-  </div>
-  <div *ngIf="totalPages > 1" class="col-10" style="text-align: center;">
-    <button (click)="onChangePage('prev')" nbButton size="tiny" class="button-blue page-button">
-      <<
-    </button>
-    <button (click)="onChangePage('current')" nbButton size="tiny" class="button-blue page-button">
-      {{ currentPage }}
-    </button>
-    <button (click)="onChangePage('next')" nbButton size="tiny" class="button-blue page-button">
-      >>
-    </button>
-  </div>
-  <div class="col-1">
   </div>
 </div>

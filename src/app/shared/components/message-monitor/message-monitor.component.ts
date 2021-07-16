@@ -5,6 +5,7 @@ import { IntervalService } from 'app/common/services/interval/interval.service';
 import { MessagesService } from 'app/common/services/messages/messages.service';
 import { ChannelsService } from 'app/common/services/channels/channels.service';
 import { environment } from 'environments/environment';
+import { MessageValuePipe } from 'app/shared/pipes/message-value.pipe';
 
 @Component({
   selector: 'ngx-message-monitor',
@@ -17,8 +18,9 @@ export class MessageMonitorComponent implements OnInit, OnChanges, OnDestroy {
 
   mode: string = 'json';
   modes: string[] = ['json', 'table', 'chart'];
-  valType: string = 'float';
-  valTypes: string[] = ['float', 'bool', 'string', 'data'];
+  httpAdaptType: string = 'float';
+  httpAdaptVal: any;
+  httpAdaptTypes: string[] = ['float', 'bool', 'string', 'data'];
 
   msgDatasets: Dataset[] = [];
 
@@ -28,14 +30,13 @@ export class MessageMonitorComponent implements OnInit, OnChanges, OnDestroy {
     publisher: '',
     subtopic: '',
     name: '',
-    value: '',
     from: 0,
     to: 0,
   };
 
   readerUrl: ReaderUrl = {
     prefix: environment.readerPrefix,
-    sufix: environment.readerSufix,
+    suffix: environment.readerSuffix,
   };
 
   publishers: Thing[] = [];
@@ -52,6 +53,7 @@ export class MessageMonitorComponent implements OnInit, OnChanges, OnDestroy {
     private intervalService: IntervalService,
     private messagesService: MessagesService,
     private channelsService: ChannelsService,
+    private messageValuePipe: MessageValuePipe,
   ) {}
 
   ngOnInit() {
@@ -80,23 +82,24 @@ export class MessageMonitorComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  createChart() {
-    const messages = this.messagesPage.rows.map((msg: Message) => {
-      const m: Message = {time: msg.time, value: msg.value};
-      return m;
-    });
-
-    const ds: Dataset = {
-      label: `Channel: ${this.chanID}`,
-      messages: messages,
-    };
-
-    this.msgDatasets = [ds];
-  }
-
   getChannelMessages() {
     if (this.chanID === '' || this.thingKey === '') {
       return;
+    }
+
+    switch (this.httpAdaptType) {
+      case 'string':
+        this.filters.vs = this.httpAdaptVal;
+        break;
+      case 'data':
+        this.filters.vd = this.httpAdaptVal;
+        break;
+      case 'bool':
+        this.filters.vb = this.httpAdaptVal;
+        break;
+      case 'float':
+        this.filters.v = this.httpAdaptVal;
+        break;
     }
 
     this.messagesPage.rows = [];
@@ -107,9 +110,15 @@ export class MessageMonitorComponent implements OnInit, OnChanges, OnDestroy {
             offset: resp.offset,
             limit: resp.limit,
             total: resp.total,
-            rows: resp.messages,
+            rows: resp.messages.map((msg: MainfluxMsg) => {
+              msg.value = this.messageValuePipe.transform(msg);
+              return msg;
+            }),
           };
-          this.createChart();
+          this.msgDatasets = [{
+            label: `Channel: ${this.chanID}`,
+            messages: <Message[]>this.messagesPage.rows,
+          }];
         }
       },
     );

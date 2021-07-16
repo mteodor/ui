@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { environment } from 'environments/environment';
 import { ChannelsService } from 'app/common/services/channels/channels.service';
 import { NotificationsService } from 'app/common/services/notifications/notifications.service';
 import { Channel, Thing, TableConfig, TablePage } from 'app/common/interfaces/mainflux.interface';
@@ -13,22 +12,21 @@ import { Channel, Thing, TableConfig, TablePage } from 'app/common/interfaces/ma
   styleUrls: ['./channels.details.component.scss'],
 })
 export class ChannelsDetailsComponent implements OnInit {
-  experimental: Boolean = environment.experimental;
-
   channel: Channel = {};
   thingKey = '';
 
-  connectedThings: Thing[] = [];
-  disconnectedThings: Thing[] = [];
-
-  selectedThings: string[] = [];
-  editorMetadata = '';
-
   tableConfig: TableConfig = {
     colNames: ['Name', 'Thing ID'],
-    keys: ['name', 'id', 'delete'],
+    keys: ['name', 'id', 'checkbox'],
   };
-  tablePage: TablePage = {};
+
+  connThingsPage: TablePage = {};
+  disconnThingsPage: TablePage = {};
+
+  thingsToConnect: string[] = [];
+  thingsToDisconnect: string[] = [];
+
+  editorMetadata = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -65,8 +63,8 @@ export class ChannelsDetailsComponent implements OnInit {
   }
 
   onConnect() {
-    if (this.selectedThings.length > 0) {
-      this.channelsService.connectThings([this.channel.id], this.selectedThings).subscribe(
+    if (this.thingsToConnect.length > 0) {
+      this.channelsService.connectThings([this.channel.id], this.thingsToConnect).subscribe(
         resp => {
           this.updateConnections();
           this.notificationsService.success('Thing(s) successfully connected', '');
@@ -77,17 +75,20 @@ export class ChannelsDetailsComponent implements OnInit {
     }
   }
 
-  onDisconnect(row: any) {
-    this.channelsService.disconnectThing(this.channel.id, row.id).subscribe(
-      resp => {
-        this.updateConnections();
-        this.notificationsService.success('Thing successfully disconnected', '');
-      },
-    );
+  onDisconnect() {
+    this.thingsToDisconnect.forEach(thingID => {
+      this.channelsService.disconnectThing(this.channel.id, thingID).subscribe(
+        resp => {
+          this.updateConnections();
+          this.notificationsService.success('Thing successfully disconnected', '');
+        },
+      );
+    });
   }
 
   updateConnections() {
-    this.selectedThings = [];
+    this.thingsToConnect = [];
+    this.thingsToDisconnect = [];
     this.findConnectedThings();
     this.findDisconnectedThings();
   }
@@ -95,41 +96,70 @@ export class ChannelsDetailsComponent implements OnInit {
   findConnectedThings(offset?: number, limit?: number) {
     this.channelsService.connectedThings(this.channel.id, offset, limit).subscribe(
       (resp: any) => {
-        this.connectedThings = resp.things;
-        this.tablePage = {
+        this.connThingsPage = {
           offset: resp.offset,
           limit: resp.limit,
           total: resp.total,
           rows: resp.things,
         };
-        if (this.connectedThings.length > 0) {
-          this.thingKey = this.connectedThings[0].key;
+        if (this.connThingsPage.rows.length > 0) {
+          const thing: Thing = this.connThingsPage.rows[0];
+          this.thingKey = thing.key;
         }
       },
     );
   }
 
+  findDisconnectedThings(offset?: number, limit?: number) {
+    this.channelsService.disconnectedThings(this.channel.id, offset, limit).subscribe(
+      (resp: any) => {
+        this.disconnThingsPage = {
+          offset: resp.offset,
+          limit: resp.limit,
+          total: resp.total,
+          rows: resp.things,
+        };
+      },
+    );
+  }
 
-    onChangeLimit(lim: number) {
-      this.findConnectedThings(0, lim);
-    }
+  onChangeLimit(limit: number) {
+    this.findConnectedThings(0, limit);
+  }
+
+  onChangeLimitDisconn(limit: number) {
+    this.findDisconnectedThings(0, limit);
+  }
 
   onChangePage(dir: any) {
     if (dir === 'prev') {
-      const offset = this.tablePage.offset - this.tablePage.limit;
-      this.findConnectedThings(offset, this.tablePage.limit);
+      const offset = this.connThingsPage.offset - this.connThingsPage.limit;
+      this.findConnectedThings(offset, this.connThingsPage.limit);
     }
     if (dir === 'next') {
-      const offset = this.tablePage.offset + this.tablePage.limit;
-      this.findConnectedThings(offset, this.tablePage.limit);
+      const offset = this.connThingsPage.offset + this.connThingsPage.limit;
+      this.findConnectedThings(offset, this.connThingsPage.limit);
     }
   }
 
-  findDisconnectedThings() {
-    this.channelsService.disconnectedThings(this.channel.id).subscribe(
-      (respDisconns: any) => {
-        this.disconnectedThings = respDisconns.things;
-      },
-    );
+  onChangePageDisconn(dir: any) {
+    if (dir === 'prev') {
+      const offset = this.disconnThingsPage.offset - this.disconnThingsPage.limit;
+      this.findDisconnectedThings(offset, this.disconnThingsPage.limit);
+    }
+    if (dir === 'next') {
+      const offset = this.disconnThingsPage.offset + this.disconnThingsPage.limit;
+      this.findDisconnectedThings(offset, this.disconnThingsPage.limit);
+    }
+  }
+
+  onCheckboxConns(row: any) {
+    const index = this.thingsToConnect.indexOf(row.id);
+    (index > -1) ? this.thingsToConnect.splice(index, 1) : this.thingsToConnect.push(row.id);
+  }
+
+  onCheckboxDisconns(row: any) {
+    const index = this.thingsToDisconnect.indexOf(row.id);
+    (index > -1) ? this.thingsToDisconnect.splice(index, 1) : this.thingsToDisconnect.push(row.id);
   }
 }
